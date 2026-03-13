@@ -1,7 +1,21 @@
-FROM node:18 AS build
+FROM node:20-alpine
+
+LABEL maintainer="Ecommerce_API"
+LABEL version="1.0"
+
 WORKDIR /app
-COPY package.json ./
+
+COPY package*.json ./
+
 RUN npm install
+
 COPY . .
+
+RUN adduser -D appuser
+USER appuser
+
 EXPOSE 5001
-CMD ["npm",  "run", "dev"]
+
+HEALTHCHECK CMD wget -qO- http://localhost:5001/health || exit 1
+
+CMD ["node", "server.js"]
