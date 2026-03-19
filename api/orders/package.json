@@ -18,6 +18,7 @@
   "dependencies": {
     "express": "^5.2.1",
     "nodemon": "^3.1.14",
+    "pg": "^8.20.0",
     "pg-pool": "^3.13.0",
     "postgres": "^3.4.8"
   }

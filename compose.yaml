@@ -1,0 +1,78 @@
+services:
+
+  web:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./web/default.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - frontend
+
+  db_product:
+    image: postgres:alpine
+    environment:
+      POSTGRES_PASSWORD: password
+      DATABASE_URL: postgresql://postgres:password@db_product:5002/docker_products
+    networks:
+      - backend
+    volumes:
+      - product_data:/var/lib/postgres
+      - ./api/products/createTable.sql:/docker-entrypoint-initdb.d/create_database.sql
+
+  api_product:
+    build: ./api/products
+    networks:
+      - frontend
+      - backend
+    volumes:
+      - product_data:/var/lib/postgres
+#------------------------------
+  db_order:
+    image: postgres:alpine
+    environment:
+      POSTGRES_PASSWORD: password
+      DATABASE_URL: postgresql://postgres:password@db_order:5432/docker_orders
+    networks:
+      - backend
+    volumes:
+      - order_data:/var/lib/postgres
+      - ./api/orders/createTable.sql:/docker-entrypoint-initdb.d/create_database.sql
+
+  api_order:
+    build: ./api/orders
+    networks:
+      - frontend
+      - backend
+    volumes:
+      - order_data:/var/lib/postgres
+
+#------------------------
+
+  db_users:
+    image: postgres:alpine
+    environment:
+      POSTGRES_PASSWORD: password
+      DATABASE_URL: postgresql://postgres:password@db_users:5432/docker_users
+    networks:
+      - backend
+    volumes:
+      - users_data:/var/lib/postgres
+      - ./api/users/createTable.sql:/docker-entrypoint-initdb.d/create_database.sql
+
+  api_users:
+    build: ./api/users
+    networks:
+      - frontend
+      - backend
+    volumes:
+      - users_data:/var/lib/postgres
+
+networks:
+  frontend:
+  backend:
+
+volumes:
+  product_data:
+  users_data:
+  order_data:
